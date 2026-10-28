@@ -1,20 +1,30 @@
-#!/usr/bin/env sh
+name: Build Android TV Launcher APK
 
-#
-# Copyright 2015 the original author or authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
-APP_HOME="$(dirname "$(readlink -f "$0")")"
-exec java -jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" "$@"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Build Debug APK directly
+      run: gradle assembleDebug
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vontar-launcher-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
+
